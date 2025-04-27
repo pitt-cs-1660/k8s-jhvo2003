@@ -9,9 +9,7 @@ metadata:
 spec:
   ports:
     - port: 3306
-  ##
   # Create service selector labels here
-  ##
   selector:
     app: wordpress
     tier: mysql
@@ -21,9 +19,7 @@ kind: ConfigMap
 metadata:
   name: wordpress-mysql
 data:
-  ##
   # create non-sensative data attributes
-  ##
   - database: wordpress
   - user: wordpress
 ---
@@ -35,17 +31,13 @@ metadata:
     app: wordpress
     tier: mysql
 spec:
-  ##
   # Create app label selectors here
-  ##
   selector:
     matchLabels:
       app: wordpress
       tier: mysql
   template:
-    ##
     # Create metadata labels here
-    ##
     metadata:
       labels:
         app: wordpress
@@ -55,6 +47,8 @@ spec:
         - image: mysql:8.0
           name: mysql
           env:
+            # mount non-sensitive environment vars from configmap
+            # MYSQL_DATABASE | MYSQL_USER
             - name: MYSQL_DATABASE
               valueFrom:
                 configMapKeyRef:
@@ -65,7 +59,8 @@ spec:
                 configMapKeyRef:
                   name: wordpress-mysql
                   key: user
-
+            # mount sensitive environment vars from secret
+            # MYSQL_ROOT_PASSWORD | MYSQL_PASSWORD
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -79,11 +74,11 @@ spec:
           ports:
             - containerPort: 3306
               name: mysql
-      # define volume mounts here, be sure to reference
-      # the PVC in your container spec
-      volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: mysql-persistent-storage
+          # define volume mounts here, be sure to reference
+          # the PVC in your container spec
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-persistent-storage
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
