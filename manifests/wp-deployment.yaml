@@ -40,7 +40,7 @@ spec:
   template:
     # Create metadata labels here
     metadata:
-      lables:
+      labels:
         app: wordpress
         tier: frontend
     spec:
@@ -48,11 +48,10 @@ spec:
       - image: wordpress:6.2.1-apache
         name: wordpress
         env:
-          # mount non-sensitive environment vars from configmap ref
-          # WORDPRESS_DB_HOST | WORDPRESS_DB_USER
-
-          # mount sensitive environment vars from secret ref
-          # WORDPRESS_DB_PASSWORD (hint use the user-password key)
+        # mount non-sensitive environment vars from configmap ref
+        # WORDPRESS_DB_HOST | WORDPRESS_DB_USER
+        # mount sensitive environment vars from secret ref
+        # WORDPRESS_DB_PASSWORD (hint use the user-password key)
         - name: WORDPRESS_DB_HOST
           valueFrom:
             configMapKeyRef:
@@ -68,23 +67,22 @@ spec:
             secretKeyRef:
               name: database
               key: user-password
+
         ports:
         - containerPort: 80
           name: wordpress
-        # define volume mounts here, be sure to reference
-        # the PVC in your container spec
+      # define volume mounts here, be sure to reference
+      # the PVC in your container spec
         volumeMounts:
         - name: wordpress-persistent-storage
           mountPath: /var/www/html
-            
+
       volumes:
       - name: wordpress-persistent-storage
         persistentVolumeClaim:
           claimName: wp-pv-claim
 ---
-##
 # Create persistent volume claim here
-##
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
