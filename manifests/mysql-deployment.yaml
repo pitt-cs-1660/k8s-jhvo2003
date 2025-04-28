@@ -20,8 +20,8 @@ metadata:
   name: wordpress-mysql
 data:
   # create non-sensative data attributes
-  - database: wordpress
-  - user: wordpress
+  database: wordpress
+  user: wordpress
 ---
 apiVersion: apps/v1
 kind: Deployment
